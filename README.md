@@ -63,7 +63,7 @@ All sensitive data like Azure endpoints and keys are stored using **.NET user se
 ```bash
 dotnet user-secrets set "SemanticKernel:Endpoint" "https://your-endpoint"
 dotnet user-secrets set "SemanticKernel:ApiKey" "your-api-key"
-dotnet user-secrets set "SemanticKernel:DeploymentName" "gpt-35-turbo"
+dotnet user-secrets set "SemanticKernel:ModelId" "your-model-id"
 ```
 
 These values are loaded into the app using IConfiguration.
@@ -76,22 +76,21 @@ Data includes properties like city, province, zip code, energy label, bedrooms, 
 
 Properties are localized to the Netherlands.
 
-## Demo
+## 📹 Demo
 
 
 - [Demo available on YouTube](https://youtu.be/tupiUTkqohs?si=1P4YtlSqBNgY2_R6)
 
 
-
 ## 📚 References
 
-📘 Microsoft Semantic Kernel
+- Microsoft Semantic Kernel
 
-🧠 Azure OpenAI Service
+- Azure OpenAI Service
 
-⚡ Azure AI Foundry
+- Azure AI Foundry
 
-💬 Getting started with Semantic Kernel in C#
+- Getting started with Semantic Kernel in C#
 
 ## 🚀 Next Steps
 
