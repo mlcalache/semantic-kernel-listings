@@ -70,11 +70,18 @@ These values are loaded into the app using IConfiguration.
 
 ## 🗃️ Real Estate Data
 
-All listing data is mocked
+All listing data is mocked.
 
-Data includes properties like city, province, zip code, energy label, bedrooms, pricing, and more
+Data includes properties like city, province, zip code, energy label, bedrooms, pricing, and more.
 
-Properties are localized to the Netherlands
+Properties are localized to the Netherlands.
+
+## Demo
+
+
+- [Demo available on YouTube](https://youtu.be/fhmm23A_ZEQ)
+
+
 
 ## 📚 References
 
