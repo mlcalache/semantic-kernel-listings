@@ -12,8 +12,7 @@ public class RealEstateRepository : IRealEstateRepository
     public RealEstateRepository(string fileName)
     {
         string baseDirectory = AppContext.BaseDirectory;
-        // _filePath = Path.Combine(baseDirectory, "data", fileName);
-        _filePath = "/Users/matheuscalache/Documents/source/matheus@github/first-semantic-kernel/data/real_estate_data.json";
+        _filePath = Path.Combine(baseDirectory, "data", fileName);
         LoadData();
     }
 

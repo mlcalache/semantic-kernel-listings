@@ -10,12 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="data\real_estate_data.json">
+    <Content Include="data/real_estate_data.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="real_estate_data.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
