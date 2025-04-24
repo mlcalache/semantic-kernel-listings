@@ -105,6 +105,6 @@ Support richer queries with embeddings or vector search
 
 ## 👋 Author
 
-Created by [Your Name] as an educational project and hands-on experiment with AI + .NET.
+Created by Matheus de Lara Calache as an educational project and hands-on experiment with AI + .NET.
 
 Feel free to fork, star, or contribute!
