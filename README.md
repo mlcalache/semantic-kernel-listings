@@ -79,7 +79,7 @@ Properties are localized to the Netherlands.
 ## Demo
 
 
-- [Demo available on YouTube](https://youtu.be/fhmm23A_ZEQ)
+- [Demo available on YouTube](https://youtu.be/tupiUTkqohs?si=1P4YtlSqBNgY2_R6)
 
 
 
