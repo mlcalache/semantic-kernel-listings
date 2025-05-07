@@ -47,6 +47,7 @@ The plugin parses the intent and filters data accordingly from a local mock data
 
 /Models/
 └── RealEstateListing.cs            # Core entity representing a real estate object
+└── RealEstateListingFilter.cs      # Entity representing a filter to search for real estate objects
 
 /Plugins/
 └── ListingPlugin.cs                # Semantic Kernel plugin for property queries
