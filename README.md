@@ -42,8 +42,11 @@ The plugin parses the intent and filters data accordingly from a local mock data
 ## 🏗️ Project Structure
 
 ```
-/data/
+/Data/
 └── real_estate_data.json           # Mocked property data in Dutch cities
+
+/Models/
+└── RealEstateListing.cs            # Core entity representing a real estate object
 
 /Plugins/
 └── ListingPlugin.cs                # Semantic Kernel plugin for property queries
@@ -51,8 +54,8 @@ The plugin parses the intent and filters data accordingly from a local mock data
 /Repositories/
 └── RealEstateRepository.cs         # Repository for managing listings (CRUD)
 
-/Models/
-└── RealEstateListing.cs            # Core entity representing a real estate object
+/Services/
+└── RealEstateListingService.cs     # Service responsible for business logic and connecting to the repository layer
 
 Program.cs                          # Initializes config, SK, and runs the demo
 ```
