@@ -30,9 +30,10 @@ The use case simulates a **real estate listings application**, where users can *
 
 The project uses **Semantic Kernel Plugins** to enable chat-based querying of property listings.
 
-You can ask things like:
+We can ask things like:
 
-> Find houses for sale in Amsterdam with at least 3 bedrooms and energy label A. List apartments available for rent under €1500 in Utrecht.
+> Find houses for sale in Amsterdam with at least 3 bedrooms and energy label A.
+> List apartments available for rent under €1500 in Utrecht.
 
 The plugin parses the intent and filters data accordingly from a local mock database.
 
@@ -60,7 +61,14 @@ Program.cs                          # Initializes config, SK, and runs the demo
 
 ## 🔐 Configuration & Secrets
 
-All sensitive data like Azure endpoints and keys are stored using **.NET user secrets**:
+All sensitive data like Azure endpoints and keys are stored using **.NET user secrets**.
+First, you need to initialize the user-secrets:
+
+```bash
+dotnet user-secrets init
+```
+
+Then you can populate the user-secret variables:
 
 ```bash
 dotnet user-secrets set "SemanticKernel:Endpoint" "https://your-endpoint"
@@ -80,18 +88,13 @@ Properties are localized to the Netherlands.
 
 ## 📹 Demo
 
-
 - [Demo available on YouTube](https://youtu.be/tupiUTkqohs?si=1P4YtlSqBNgY2_R6)
-
 
 ## 📚 References
 
 - Microsoft Semantic Kernel
-
 - Azure OpenAI Service
-
 - Azure AI Foundry
-
 - Getting started with Semantic Kernel in C#
 
 ## 🚀 Next Steps
@@ -104,7 +107,41 @@ Deploy as a web API or chat UI interface
 
 Support richer queries with embeddings or vector search
 
-## 👋 Author
+### Tech details
+
+#### Temperature
+
+Temperature is a parameter that controls the randomness of the model's output.
+
+It affects the probability distribution over the possible next tokens (words or characters) that the model can generate.
+
+Range: The temperature can be set from 0 to 1 or higher (though typically values between 0 and 1 are used).
+
+Temperature = 0: This makes the model output deterministic responses. The model will choose the most probable next token at each step, leading to more predictable and less creative outputs. This is useful when we want clear, concise, and reliable answers.
+
+Temperature = 1: This allows for more randomness and creative responses. The model will explore a wider range of possible next tokens, resulting in more diverse outputs.
+
+Temperature > 1: This will increase the randomness further, though it can lead to less coherent or sensible responses.
+
+In this case, setting Temperature = 0 means we are asking for responses that are as predictable and structured as possible.
+
+Summary: Temperature = 0: Predictable, deterministic output with little randomness.
+
+#### TopP (nucleus sampling)
+
+Top-p, also known as nucleus sampling, is a method for sampling from the model's output distribution.
+
+Instead of considering all possible tokens (words) when generating the next token, top-p sampling restricts the set of possible tokens to a subset where the cumulative probability is less than or equal to p.
+
+Top-P = 1: This means that the model considers the entire probability distribution of possible tokens. Effectively, this is similar to the default behavior where the model has access to all potential words (no truncation), meaning it can generate more diverse and potentially creative responses.
+
+Top-P < 1: This limits the model to a subset of tokens whose cumulative probability is less than or equal to the value of p. For example, if we set top-p to 0.9, the model would only consider the smallest set of tokens whose probabilities sum to 90%, effectively cutting out less likely options. This often results in more coherent responses but can make them less creative.
+
+So, when we set TopP = 1, we're allowing the model to consider the full distribution of words (meaning it can generate a wide range of possible outputs).
+
+Summary: Top-P = 1 means a full probability distribution of tokens, allowing for a wider variety of potential outputs, though the responses are still determined by the top choices the model makes.
+
+## Author
 
 Created by Matheus de Lara Calache as an educational project and hands-on experiment with AI + .NET.
 

@@ -1,4 +1,4 @@
-﻿// Import packages
+﻿// Imports
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
@@ -6,22 +6,18 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.Extensions.Configuration;
 
-// Load config with secrets
+// Load configuration from secrets
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddUserSecrets<Program>()
     .Build();
 
-// Read from secrets
-// To add a new secret, use dotnet user-secrets set "YOUR KEY HERE" "YOUR SECRET HERE"
-// You need:
-//    dotnet user-secrets set "SemanticKernel:ModelId" "YORU SECRET HERE"
-//    dotnet user-secrets set "SemanticKernel:Endpoint" "YORU SECRET HERE"
-//    dotnet user-secrets set "SemanticKernel:ApiKey" "YORU SECRET HERE"
-// To see the secrets, use dotnet user-secrets list
 string? modelId = configuration["SemanticKernel:ModelId"];
 string? endpoint = configuration["SemanticKernel:Endpoint"];
 string? apiKey = configuration["SemanticKernel:ApiKey"];
+
+Console.ForegroundColor = ConsoleColor.DarkYellow;
+Console.WriteLine($"Model: {modelId}");
 
 if (string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(modelId))
 {
@@ -29,54 +25,96 @@ if (string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(apiKey) || 
     return;
 }
 
-// Create a kernel with Azure OpenAI chat completion
-// var builder = Kernel.CreateBuilder().AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
-var builder = Kernel.CreateBuilder();
+// Setup dependency injection container
+var services = new ServiceCollection();
 
-builder.AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
+// Add core services
+services.AddSingleton<IConfiguration>(configuration);
 
-// Add enterprise components
-// builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
+// Register data source
+var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "real_estate_data.json");
+services.AddSingleton<IRealEstateRepository>(new RealEstateRepository(dataPath));  // Register repository with the interface
+services.AddSingleton<IRealEstateSearchService, RealEstateSearchService>(); // Register service with interface
+services.AddSingleton<IListingPlugin, ListingPlugin>();  // Register plugin with the interface
 
-// Build the kernel
-Kernel kernel = builder.Build();
+services.AddLogging(logging => logging.AddConsole().SetMinimumLevel(LogLevel.Debug));
 
-// Retrieve the chat completion service
+// Register Semantic Kernel and chat completion
+services.AddSingleton(sp =>
+{
+    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+
+    var builder = Kernel.CreateBuilder();
+
+    builder.Services.AddSingleton(loggerFactory);
+
+    builder.AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
+
+    var kernel = builder.Build();
+
+    kernel.Plugins.AddFromObject(sp.GetRequiredService<IListingPlugin>(), "ListingPlugin");
+
+    return kernel;
+});
+
+// Build service provider
+var provider = services.BuildServiceProvider();
+
+// Get services
+var kernel = provider.GetRequiredService<Kernel>();
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
-// Add a plugin
-// kernel.Plugins.AddFromType<LightsPlugin>("Lights");
-var repository = new RealEstateRepository("real_estate_data.json");
-kernel.Plugins.AddFromObject(new ListingPlugin(repository), "ListingPlugin");
-
-// Enable planning
-OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new() 
-{
-    FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
-};
-
-// Create a history store the conversation
+// Create a chat history
 var history = new ChatHistory();
 
-// Initiate a back-and-forth chat
+history.AddSystemMessage("You are a strict validator. Never fabricate data. If information is missing, just state which fields are missing. Do not make anything up.");
+
+// Execution settings
+// Optional: control temperature and other settings
+var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
+{
+    FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
+    Temperature = 0,
+    TopP = 1,
+    MaxTokens = 300
+};
+
+KernelArguments kernelArguments;
+
+// Start the chat loop
 string? userInput;
-do {
-    // Collect user input
+do
+{
+    Console.ForegroundColor = ConsoleColor.White;
     Console.Write("User > ");
     userInput = Console.ReadLine();
 
-    // Add user input
+    if (string.IsNullOrWhiteSpace(userInput)) break;
+
+    // Create KernelArguments for the userInput
+    kernelArguments = new KernelArguments
+    {
+        { "data", userInput } // "data" should match the parameter name in your plugin
+    };
+
+    // var validationResult = await validateFunc.InvokeAsync(kernel, kernelArguments);
+    // Console.ForegroundColor = ConsoleColor.Yellow;
+    // Console.WriteLine("Validator > " + validationResult);
+
+    // // optionally decide whether to continue or not
+    // if (validationResult.ToString().Contains("Incomplete"))
+    //     continue;
+
     history.AddUserMessage(userInput);
 
-    // Get the response from the AI
     var result = await chatCompletionService.GetChatMessageContentAsync(
         history,
         executionSettings: openAIPromptExecutionSettings,
         kernel: kernel);
 
-    // Print the results
+    Console.ForegroundColor = ConsoleColor.Magenta;
     Console.WriteLine("Assistant > " + result);
 
-    // Add the message from the agent to the chat history
     history.AddMessage(result.Role, result.Content ?? string.Empty);
-} while (userInput is not null);
+
+} while (true);
