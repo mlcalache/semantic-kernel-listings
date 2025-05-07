@@ -6,62 +6,60 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.Extensions.Configuration;
 
-// Load configuration from secrets
-var configuration = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddUserSecrets<Program>()
-    .Build();
+// // Load configuration from secrets
+// var configuration = new ConfigurationBuilder()
+//     .SetBasePath(Directory.GetCurrentDirectory())
+//     .AddUserSecrets<Program>()
+//     .Build();
 
-string? modelId = configuration["SemanticKernel:ModelId"];
-string? endpoint = configuration["SemanticKernel:Endpoint"];
-string? apiKey = configuration["SemanticKernel:ApiKey"];
+// string? modelId = configuration["SemanticKernel:ModelId"];
+// string? endpoint = configuration["SemanticKernel:Endpoint"];
+// string? apiKey = configuration["SemanticKernel:ApiKey"];
 
-Console.ForegroundColor = ConsoleColor.DarkYellow;
-Console.WriteLine($"Model: {modelId}");
+// Console.ForegroundColor = ConsoleColor.DarkYellow;
+// Console.WriteLine($"Model: {modelId}");
 
-if (string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(modelId))
-{
-    Console.WriteLine("Missing Semantic Kernel configuration.");
-    return;
-}
 
-// Setup dependency injection container
-var services = new ServiceCollection();
 
-// Add core services
-services.AddSingleton<IConfiguration>(configuration);
+// // Setup dependency injection container\
+// var services = new ServiceCollection();
 
-// Register data source
-var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "real_estate_data.json");
-services.AddSingleton<IRealEstateRepository>(new RealEstateRepository(dataPath));  // Register repository with the interface
-services.AddSingleton<IRealEstateSearchService, RealEstateSearchService>(); // Register service with interface
-services.AddSingleton<IListingPlugin, ListingPlugin>();  // Register plugin with the interface
+// // Add core services
+// services.AddSingleton<IConfiguration>(configuration);
 
-services.AddLogging(logging => logging.AddConsole().SetMinimumLevel(LogLevel.Debug));
+// // Register data source
+// var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "real_estate_data.json");
+// services.AddSingleton<IRealEstateRepository>(new RealEstateRepository(dataPath));  // Register repository with the interface
+// services.AddSingleton<IRealEstateSearchService, RealEstateSearchService>(); // Register service with interface
+// // services.AddSingleton<IListingPlugin, ListingPlugin>();  // Register plugin with the interface
 
-// Register Semantic Kernel and chat completion
-services.AddSingleton(sp =>
-{
-    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+// services.AddLogging(logging => logging.AddConsole().SetMinimumLevel(LogLevel.Debug));
 
-    var builder = Kernel.CreateBuilder();
+// // Register Semantic Kernel and chat completion
+// services.AddSingleton(sp =>
+// {
+//     var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
 
-    builder.Services.AddSingleton(loggerFactory);
+//     var builder = Kernel.CreateBuilder();
 
-    builder.AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
+//     builder.Services.AddSingleton(loggerFactory);
 
-    var kernel = builder.Build();
+//     builder.AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
 
-    kernel.Plugins.AddFromObject(sp.GetRequiredService<IListingPlugin>(), "ListingPlugin");
+//     var kernel = builder.Build();
 
-    return kernel;
-});
+//     kernel.Plugins.AddFromObject(sp.GetRequiredService<IListingPlugin>(), "ListingPlugin");
 
-// Build service provider
-var provider = services.BuildServiceProvider();
+//     return kernel;
+// });
+
+
+var app = KernelHostBuilder.Build(args);
+
+using var scope = app.Services.CreateScope();
 
 // Get services
-var kernel = provider.GetRequiredService<Kernel>();
+var kernel = scope.ServiceProvider.GetRequiredService<Kernel>();
 var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
 // Create a chat history
@@ -76,7 +74,7 @@ var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
     FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
     Temperature = 0,
     TopP = 1,
-    MaxTokens = 300
+    MaxTokens = 1000
 };
 
 KernelArguments kernelArguments;
