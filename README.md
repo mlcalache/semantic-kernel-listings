@@ -111,9 +111,9 @@ Deploy as a web API or chat UI interface
 
 Support richer queries with embeddings or vector search
 
-### Tech details
+## Tech details
 
-#### Temperature
+### Temperature
 
 Temperature is a parameter that controls the randomness of the model's output.
 
@@ -131,7 +131,7 @@ In this case, setting Temperature = 0 means we are asking for responses that are
 
 Summary: Temperature = 0: Predictable, deterministic output with little randomness.
 
-#### TopP (nucleus sampling)
+### TopP (nucleus sampling)
 
 Top-p, also known as nucleus sampling, is a method for sampling from the model's output distribution.
 
