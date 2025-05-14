@@ -96,10 +96,10 @@ Properties are localized to the Netherlands.
 
 ## 📚 References
 
-- Microsoft Semantic Kernel
-- Azure OpenAI Service
-- Azure AI Foundry
-- Getting started with Semantic Kernel in C#
+- [Microsoft Semantic Kernel](https://github.com/microsoft/semantic-kernel)
+- [Azure OpenAI Service](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/)
+- [Azure AI Foundry](https://aka.ms/ai-foundry)
+- [Getting started with Semantic Kernel in C#](https://learn.microsoft.com/en-us/semantic-kernel/get-started/first-function-csharp)
 
 ## 🚀 Next Steps
 
